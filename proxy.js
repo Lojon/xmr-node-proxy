@@ -1255,7 +1255,7 @@ function activateHTTP() {
 			}
 			let tablePool = "";
 			let tableBody = "";
-    			for (let miner_id in miners) {
+    			/*for (let miner_id in miners) {
 				const miner = miners[miner_id];
 				const name = miner.logString;
 				let avgSpeed = miner.active ? miner.avgSpeed + " H/s" : "offline";
@@ -1274,7 +1274,7 @@ function activateHTTP() {
 					<td><TAB TO=t10><div class="tooltip">${agent_parts[0]}<span class="tooltiptext">${miner.agent}</div></td>
 				</tr>
 				`;
-			}
+			}*/
     			for (let poolName in poolHashrate) {
 				let poolPercentage = (100*poolHashrate[poolName]/totalHashrate).toFixed(2);
 				let targetDiff = activePools[poolName].activeBlocktemplate ? activePools[poolName].activeBlocktemplate.targetDiff : "?";
