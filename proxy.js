@@ -250,14 +250,14 @@ function Pool(poolData){
 	            pool.socket = tls.connect(pool.port, pool.hostname, {rejectUnauthorized: pool.allowSelfSignedSSL})
 		    .on('connect', () => { poolSocket(pool.hostname); })
 		    .on('error', (err) => {
-	                setTimeout(connect2, 30*1000, pool);
+	                connect2(pool);
 	                console.warn(`${global.threadName}SSL pool socket connect error from ${pool.hostname}: ${err}`);
 	            });
 	        } else {
 	            pool.socket = net.connect(pool.port, pool.hostname)
 		    .on('connect', () => { poolSocket(pool.hostname); })
 		    .on('error', (err) => {
-	                setTimeout(connect2, 30*1000, pool);
+	                connect2(pool);
 	                console.warn(`${global.threadName}Plain pool socket connect error from ${pool.hostname}: ${err}`);
 	            });
 	        }
@@ -774,11 +774,13 @@ function poolSocket(hostname){
     }).on('error', (err) => {
         console.warn(`${global.threadName}Pool socket error from ${pool.hostname}: ${err}`);
         activePools[pool.hostname].disable();
-        setTimeout(activePools[pool.hostname].connect, 30*1000, pool.hostname);
+		activePools[pool.hostname].connect(pool.hostname)
+        //setTimeout(activePools[pool.hostname].connect, 30*1000, pool.hostname);
     }).on('close', () => {
         console.warn(`${global.threadName}Pool socket closed from ${pool.hostname}`);
         activePools[pool.hostname].disable();
-        setTimeout(activePools[pool.hostname].connect, 30*1000, pool.hostname);
+		activePools[pool.hostname].connect(pool.hostname)
+        //setTimeout(activePools[pool.hostname].connect, 30*1000, pool.hostname);
     });
     socket.setKeepAlive(true);
     socket.setEncoding('utf8');
@@ -798,6 +800,9 @@ function handlePoolMessage(jsonData, hostname){
         if (jsonData.error !== null){
             console.error(`${global.threadName}Error response from pool ${pool.hostname}: ${JSON.stringify(jsonData.error)}`);
             activePools[hostname].disable();
+			if (jsonData.error.message === 'Unauthenticated'){
+				activePools[hostname].connect(pool.hostname);
+			}
             return;
         }
         let sendLog = pool.sendLog[jsonData.id];
