@@ -1,61 +1,43 @@
 {
   "pools": [
     {
-      "hostname": "gulf.moneroocean.stream",
-      "port": 10032,
+      "hostname": "hk01.supportxmr.com",
+      "port": 7777,
       "ssl": false,
       "allowSelfSignedSSL": false,
       "share": 100,
-      "username": "44qJYxdbuqSKarYnDSXB6KLbsH4yR65vpJe3ELLDii9i4ZgKpgQXZYR4AMJxBJbfbKZGWUxZU42QyZSsP4AyZZMbJBCrWr1",
-      "password": "proxy",
+      "username": "49SFRxXvjBuazwDMP3UtBcLjw2TDDfNvGUExm8gf6MtMBDJdv3wCXdz1boe3kWsnSWiRYqYbxc4g4Ga4iXDhgzgL9CMXvYE",
+      "password": "proxy:lojon.office@gmail.com",
       "keepAlive": true,
       "algo": [ "cn/1", "cn/2" ],
       "blob_type": "cryptonote",
       "default": true
-    },
-    {
-      "hostname": "pool.supportxmr.com",
-      "port": 7777,
-      "ssl": false,
-      "allowSelfSignedSSL": false,
-      "share": 0,
-      "username": "44qJYxdbuqSKarYnDSXB6KLbsH4yR65vpJe3ELLDii9i4ZgKpgQXZYR4AMJxBJbfbKZGWUxZU42QyZSsP4AyZZMbJBCrWr1",
-      "password": "proxy",
-      "keepAlive": true,
-      "algo": [ "cn/1", "cn/2" ],
-      "blob_type": "cryptonote",
-      "default": false
     }
   ],
   "listeningPorts": [
     {
-      "port": 8080,
+      "port": 5188,
       "ssl": false,
-      "diff": 5000
+      "diff": 50
     },
     {
-      "port": 8443,
-      "ssl": true,
-      "diff": 5000
-    },
-    {
-      "port": 3333,
+      "port": 5888,
       "ssl": false,
-      "diff": 10000
+      "diff": 1000
     }
   ],
   "bindAddress": "0.0.0.0",
-  "developerShare": 1,
+  "developerShare": 0,
   "daemonAddress": "127.0.0.1:18081",
   "accessControl": {
     "enabled": false,
     "controlFile": "accessControl.json"
   },
-  "httpEnable": false,
-  "httpAddress": "127.0.0.1",
-  "httpPort": "8081",
-  "httpUser": "",
-  "httpPass": "",
+  "httpEnable": true,
+  "httpAddress": "0.0.0.0",
+  "httpPort": "80",
+  "httpUser": "Lojon",
+  "httpPass": "psw",
   "addressWorkerID": false,
   "minerInactivityTime": 120,
   "keepOfflineMiners": 0,
@@ -63,8 +45,8 @@
   "theme": "light",
   "coinSettings": {
     "xmr":{
-      "minDiff": 100,
-      "maxDiff": 300000,
+      "minDiff": 5,
+      "maxDiff": 50000,
       "shareTargetTime": 15
     }
   }
