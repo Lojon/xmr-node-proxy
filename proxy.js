@@ -712,7 +712,7 @@ function enumerateWorkerStats() {
     }
 
     let pool_hs = "";
-    for (let coin in poolStates) {
+    /*for (let coin in poolStates) {
         if (!poolStates.hasOwnProperty(coin)) continue;
         for (let pool in poolStates[coin] ){
             if (!poolStates[coin].hasOwnProperty(pool) || !activePools.hasOwnProperty(pool) || poolStates[coin][pool].devPool || poolStates[coin][pool].hashrate === 0) continue;
@@ -720,7 +720,7 @@ function enumerateWorkerStats() {
             pool_hs += `${pool}/${poolStates[coin][pool].percentage.toFixed(2)}%`;
         }
     }
-    if (pool_hs != "") pool_hs = " (" + pool_hs + ")";
+    if (pool_hs != "") pool_hs = " (" + pool_hs + ")";*/
 
     // do update of algo/algo-perf if it was changed
     for (let pool in pool_algos) {
