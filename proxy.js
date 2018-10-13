@@ -799,7 +799,7 @@ function handlePoolMessage(jsonData, hostname){
     } else {
         if (jsonData.error !== null){
             console.error(`${global.threadName}Error response from pool ${pool.hostname}: ${JSON.stringify(jsonData.error)}`);
-            activePools[hostname].disable();
+            //activePools[hostname].disable();
 			if (jsonData.error.message === 'Unauthenticated'){
 				activePools[hostname].connect(pool.hostname);
 			}
