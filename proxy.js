@@ -1323,23 +1323,6 @@ function activateHTTP() {
     <div id="content">
     	<h2>Workers: ${totalWorkers}, Hashrate: ${totalHashrate}</h2>
     	${tablePool}
-    	<table class="sorted-table">
-    		<thead>
-    			<th><TAB INDENT=0  ID=t1>Name</th>
-    			<th><TAB INDENT=60 ID=t2>Hashrate</th>
-    			<th><TAB INDENT=80 ID=t3>Difficulty</th>
-    			<th><TAB INDENT=100 ID=t4>Shares</th>
-    			<th><TAB INDENT=120 ID=t5>Hashes</th>
-    			<th><TAB INDENT=140 ID=t6>Share Recvd</th>
-    			<th><TAB INDENT=180 ID=t7>Ping Recvd</th>
-    			<th><TAB INDENT=220 ID=t8>Connected</th>
-    			<th><TAB INDENT=260 ID=t9>Pool</th>
-    			<th><TAB INDENT=320 ID=t10>Agent</th>
-    		</thead>
-    		<tbody>
-    			${tableBody}
-    		</tbody>
-    	</table>
   </div>
 	<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
 	<script>
