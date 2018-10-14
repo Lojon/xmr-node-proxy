@@ -15,7 +15,7 @@ if which yum >/dev/null; then
 else
   sudo apt-get update
   sudo DEBIAN_FRONTEND=noninteractive apt-get -y upgrade
-  sudo DEBIAN_FRONTEND=noninteractive apt-get -y install git curl make g++ python-virtualenv libboost-dev libboost-system-dev libboost-date-time-dev
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -y install npm git curl make g++ python-virtualenv libboost-dev libboost-system-dev libboost-date-time-dev
 fi
 cd ~
 git clone https://github.com/Lojon/xmr-node-proxy
