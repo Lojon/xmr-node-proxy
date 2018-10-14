@@ -11,7 +11,7 @@ CURUSER=$(whoami)
 if which yum >/dev/null; then
   sudo yum -y update
   sudo yum -y upgrade
-  sudo yum -y install git curl make gcc-c++ python-virtualenv boost-devel boost-system-devel boost-date-time-devel
+  sudo yum -y install npm git curl make gcc-c++ python-virtualenv boost-devel boost-system-devel boost-date-time-devel
 else
   sudo apt-get update
   sudo DEBIAN_FRONTEND=noninteractive apt-get -y upgrade
