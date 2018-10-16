@@ -6,7 +6,7 @@
       "ssl": false,
       "allowSelfSignedSSL": false,
       "share": 100,
-      "username": "49SFRxXvjBuazwDMP3UtBcLjw2TDDfNvGUExm8gf6MtMBDJdv3wCXdz1boe3kWsnSWiRYqYbxc4g4Ga4iXDhgzgL9CMXvYE",
+      "username": "49SFRxXvjBuazwDMP3UtBcLjw2TDDfNvGUExm8gf6MtMBDJdv3wCXdz1boe3kWsnSWiRYqYbxc4g4Ga4iXDhgzgL9CMXvYE+2000000",
       "password": "proxy:lojon.office@gmail.com",
       "keepAlive": true,
       "algo": [ "cn/1", "cn/2" ],
@@ -47,7 +47,7 @@
     "xmr":{
       "minDiff": 5,
       "maxDiff": 50000,
-      "shareTargetTime": 15
+      "shareTargetTime": 60
     }
   }
 }
