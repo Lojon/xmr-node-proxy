@@ -1465,6 +1465,7 @@ function activatePorts() {
             socket.setEncoding('utf8');
 
             let dataBuffer = '';
+			var MinerId = uuidV4();
 
             let pushMessage = function (method, params) {
                 if (!socket.writable) {
