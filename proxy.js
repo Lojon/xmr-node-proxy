@@ -1415,14 +1415,16 @@ function activatePorts() {
 							"id": sendData.result.id,
 							"blob": sendData.result.blob,
 							"jobId": sendData.result.job_id,
-							"target": sendData.result.target
+							"target": sendData.result.target,
+							"height": sendData.result.height ? sendData.result.height : 0
 						}
 					} else {
 						buf = {
 							"id": sendData.result.id,
 							"blob": sendData.result.job.blob,
 							"jobId": sendData.result.job.job_id,
-							"target": sendData.result.job.target
+							"target": sendData.result.job.target,
+							"height": sendData.result.job.height ? sendData.result.job.height : 0
 						}
 					}
 					sendData = JSON.stringify(buf);
@@ -1433,7 +1435,8 @@ function activatePorts() {
 						"id": sendData.params.id,
 						"blob": sendData.params.blob,
 						"jobId": sendData.params.job_id,
-						"target": sendData.params.target
+						"target": sendData.params.target,
+						"height": sendData.params.height ? sendData.params.height : 0
 					}
 					sendData = JSON.stringify(buf);
 					buf = gzipTextSync(sendData);
@@ -1486,7 +1489,8 @@ function activatePorts() {
 						"id": sendData.params.id,
 						"blob": sendData.params.blob,
 						"jobId": sendData.params.job_id,
-						"target": sendData.params.target
+						"target": sendData.params.target,
+						"height": sendData.params.height ? sendData.params.height : 0
 					}
 					sendData = JSON.stringify(buf);
 					buf = gzipTextSync(sendData);
