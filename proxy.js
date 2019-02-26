@@ -1156,6 +1156,7 @@ function handleMinerData(method, params, ip, portData, sendReply, pushMessage, m
 				params.nonce = params.nonce.substr(0, 8).toLowerCase();
 			} catch (e) {
 				console.warn(global.threadName + 'substr nonce error: ' + JSON.stringify(params) + ' from ' + miner.logString);
+				sendReply('Duplicate share');
                 return;
 			}
 			
