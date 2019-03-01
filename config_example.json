@@ -6,7 +6,7 @@
       "ssl": false,
       "allowSelfSignedSSL": false,
       "share": 100,
-      "username": "49SFRxXvjBuazwDMP3UtBcLjw2TDDfNvGUExm8gf6MtMBDJdv3wCXdz1boe3kWsnSWiRYqYbxc4g4Ga4iXDhgzgL9CMXvYE+2000000",
+      "username": "49SFRxXvjBuazwDMP3UtBcLjw2TDDfNvGUExm8gf6MtMBDJdv3wCXdz1boe3kWsnSWiRYqYbxc4g4Ga4iXDhgzgL9CMXvYE+1000000",
       "password": "proxy:lojon.office@gmail.com",
       "keepAlive": true,
       "algo": [ "cn/2", "cn/r" ],
